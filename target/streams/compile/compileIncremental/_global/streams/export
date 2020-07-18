@@ -1,0 +1,1 @@
+scalac -bootclasspath /home/mario/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.3/scala-library-2.13.3.jar -classpath /home/mario/practice-projects/scala-tour/target/scala-2.13/classes /home/mario/practice-projects/scala-tour/src/main/scala/Main.scala
