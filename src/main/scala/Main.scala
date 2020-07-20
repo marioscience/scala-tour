@@ -2,7 +2,7 @@ import scala.math._
 
 object ScalaTour {
 	def main(args: Array[String]): Unit = {
-		println("=== MULTIPLE PARAMETER LISTS (Currying) ===")
+		println("===================== MULTIPLE PARAMETER LISTS (Currying) =====================")
 		val numbers = List(1,2,3,4,5,6,7,8,9,10)
 		val res = numbers.foldLeft(0)((m, n) => m + n)
 		println(res)
@@ -34,7 +34,7 @@ object ScalaTour {
 		println(cubes)
 
 
-		println("=== CASE CLASSES ===")
+		println("===================== CASE CLASSES =====================")
 		// write 'case class' identifier and parameter list
 		// Case CLass differences: Compact constructor, they are immutable, hashcode and equal (structural) defined on creation
 		// Flexibility for pattern matching
@@ -76,7 +76,7 @@ object ScalaTour {
 		val message6 = message4.copy()
 		println(message6 == message4)
 
-		println("=== PATTERN MATCHING ===")
+		println("===================== PATTERN MATCHING =====================")
 
 		import scala.util.Random
 
@@ -200,7 +200,7 @@ object ScalaTour {
 		println(findPlaceToSit(Couch()))
 		println(findPlaceToSit(Chair()))
 
-		println("=== SINGLETON OBJECTS ===")
+		println("===================== SINGLETON OBJECTS =====================")
 		
 		 
 		// DEFINING SINGLETON OBJECT
@@ -269,7 +269,7 @@ object ScalaTour {
 			 case None => println("Big mistake you stupid asshole. You think computers don't get tired?")
 		}
 
-		println("=== REGULAR EXPRESSION PATTERS ===")
+		println("===================== REGULAR EXPRESSION PATTERS =====================")
 
 		import scala.util.matching.Regex
 
@@ -303,7 +303,7 @@ object ScalaTour {
 		  for(patternMatch <- keyValPattern.findAllMatchIn(input))
 		  	println(s"key: ${patternMatch.group(1)} value: ${patternMatch.group(2)}")
 
-		 println("=== EXTRACTOR OBJECT ===")
+		 println("===================== EXTRACTOR OBJECT =====================")
 
 		 object CustomerID {
 		 
@@ -327,18 +327,18 @@ object ScalaTour {
 		 println(name)
 
 
-		 println("=== FOR COMPREHENSIONS ===")
+		 println("===================== FOR COMPREHENSIONS =====================")
 
 		 // for (enumerators) yield e
 		 // 
 
-		 case class User(name: String, age: Int)
+		 case class User2(name: String, age: Int)
 
 		 val userBase = List(
-		 	User("Travis", 28),
-		 	User("Kelly", 33),
-		 	User("Jennifer", 44),
-		 	User("Dennis", 23)
+		 	User2("Travis", 28),
+		 	User2("Kelly", 33),
+		 	User2("Jennifer", 44),
+		 	User2("Dennis", 23)
 		 )
 
 		 val twentySomethings = 
@@ -367,7 +367,7 @@ object ScalaTour {
 		 	case (i, j) => println(s"($i, $j)")
 		 }
 
-		 println("=== GENERIC CLASSES ===")
+		 println("===================== GENERIC CLASSES =====================")
 
 		 class Stack[A] {
 	 	 	private var elements: List[A] = Nil
@@ -400,13 +400,431 @@ object ScalaTour {
 
 		 println(fstack.pop)
 
-		 print("=== VARIANCES ===")
+		 println("===================== VARIANCES =====================")
 
 		 class Foo[+A] // covariant class
 		 class Bar[-A] // contravariant class
 		 class Baz[A] // invariant class
 
+		// COVARIANCE
+		abstract class Animal2 {
+			def name: String
+		}
+		case class Cat2(name: String) extends Animal2
+		case class Dog2(name: String) extends Animal2
 		 
-		 
+		 // List in scala is declared as sealed abstract class List[+A] which means its type parameter is covariant
+
+		 def printAnimalNames(animals: List[Animal2]): Unit = 
+		 	animals.foreach {
+		 		animal => println(animal.name)
+		 	}
+
+		 val cats: List[Cat2] = List(Cat2("Whiskers"), Cat2("Tom"))
+		 val dogs: List[Dog2] = List(Dog2("Fido"), Dog2("Rex"))
+		 val anims: List[Animal2] = List(Dog2("Dago"), Cat2("Berto"))
+
+		printAnimalNames(cats)
+
+		printAnimalNames(dogs)
+
+		printAnimalNames(anims)
+
+		// Contravariance
+		abstract class Printer[-A] {
+			def print(value: A): Unit
+		}
+
+		class AnimalPrinter extends Printer[Animal2] {
+			def print(animal: Animal2): Unit =
+				println("The animal's name is: " + animal.name)
+		}
+
+		class CatPrinter extends Printer[Cat2] {
+			def print(cat: Cat2): Unit =
+				println("The cat's name is: " + cat.name)
+		}
+
+		def printMyCat(printer: Printer[Cat2], cat: Cat2): Unit =
+			printer.print(cat)
+
+		val catPrinter: Printer[Cat2] = new CatPrinter
+		val animalPrinter: Printer[Animal2] = new AnimalPrinter
+
+		printMyCat(catPrinter, Cat2("Boots"))
+		printMyCat(animalPrinter, Cat2("Boot"))
+
+		// Invariance
+		class Container2[A](value: A) {
+			private var _value: A = value
+			def getValue: A = _value
+			def setValue(value: A): Unit = {
+				_value = value
+			}
+		}
+
+		val catContainer2: Container2[Cat2] = new Container2(Cat2("Felix"))
+		//val animalContainer: Container[Animal] = catContainer
+		//animalContainer.setValue(Dog("Spot"))
+		// val cat: Cat = catContainer.getValue // Error because invariance
+
+		// Further examples:
+		abstract class SmallAnimal extends Animal
+		case class Mouse(name: String) extends SmallAnimal
+
+		// CONCLUSION: Variance is about relation of subtypes of parameter types.
+		// Covariant: if A :> B (:< is subtype of) then class[A] >: class[B]
+		// Contravariant: if A >: B then class[A] :< class[B]
+		// Invariant: Given A >: B then class[A] and class[B] are unrelated
+
+		println("===================== UPPER TYPE BOUNDS =====================")
+
+		abstract class Animal {
+			def name: String
+		}
+
+		abstract class Pet extends Animal {}
+
+		class Cat extends Pet {
+			override def name: String = "Cat"
+		}		
+
+		class Dog extends Pet {
+			override def name: String = "Dog"
+		}
+
+		class Lion extends Animal {
+			override def name: String = "Lion"
+		}
+
+		class PetContainer[P <: Pet](p: P) {
+			def pet: P = p
+		}
+
+		val dogContainer = new PetContainer[Dog](new Dog) // respects subtype upper bound
+		val catContainer = new PetContainer[Cat](new Cat) // ^^
+
+		// val lionContainer = new PetContainer[Lion](new Lion) // Compiler ERROR, because of type bounds
+
+		println("===================== LOWER TYPE BOUNDS =====================")
+
+		// WRONG vvv function are contravariant in their parameters and covariant in their return types
+		// trait Node[+B] {
+			// def prepend(elem: B): Node[B]
+		// }
+// 
+		// case class ListNode[+B](h: B, t: Node[B]) extends Node[B] {
+			// def prepend(elem: B): ListNode[B] = ListNode(elem, this)
+			// def head: B = h
+			// def tail: Node[B] = t
+		// }
+// 
+		// case class Nil[+B]() extends Node[B] {
+			// def prepend(elem: B): ListNode[B] = ListNode(elem, this)
+		// }
+
+		trait Node[+B] {
+			def prepend[U >: B](elem: U): Node[U]
+		}
+
+		case class ListNode[+B](h: B, t: Node[B]) extends Node[B] {
+			def prepend[U >: B](elem: U): ListNode[U] = ListNode(elem, this)
+			def head: B = h
+			def tail: Node[B] = t
+		}
+
+		case class Nil2[+B]() extends Node[B] {
+			def prepend[U >: B](elem: U): ListNode[U] = ListNode(elem, this)
+		}
+
+		// Now we can do the following
+		trait Bird
+		case class AfricanSwallow() extends Bird
+		case class EuropeanSwallow() extends Bird
+
+		val africanSwallowList = ListNode[AfricanSwallow](AfricanSwallow(), Nil2())
+		val birdList: Node[Bird] = africanSwallowList
+		// <-- notice that european swallows were added after african swallows
+		birdList.prepend(EuropeanSwallow())
+
+		println("===================== INNER CLASSES =====================")
+
+		// In here only Node of the same instances can be linked together.
+		// instantiate using graphInst.newNode.
+		// class Graph {
+			// class Node {
+				// var connectedNodes: List[Node] = Nil
+				// def connectTo(node: Node): Unit = {
+					// if (!connectedNodes.exists(node.equals)) {
+						// connectedNodes = node :: connectedNodes
+					// }
+				// }
+			// }
+			// var nodes: List[Node] = Nil
+			// def newNode: Node = {
+				// val res = new Node
+				// nodes = res :: nodes
+				// res
+			// }
+		// }
+
+		class Graph {
+			class Node {
+				var connectedNodes: List[Graph#Node] = Nil
+				def connectTo(node: Graph#Node): Unit = {
+					if (!connectedNodes.exists(node.equals)) {
+						connectedNodes = node :: connectedNodes
+					}
+				}
+			}
+			var nodes: List[Node] = Nil
+			def newNode: Node = {
+				val res = new Node
+				nodes = res :: nodes
+				res
+			}
+		}
+
+		// Node is path dependent upon Graph
+		// All nodes for an instance of graph can only be created through newNode of that instance
+
+		val graph1: Graph = new Graph
+		val node1: graph1.Node = graph1.newNode
+		val node2: graph1.Node = graph1.newNode
+		val node3: graph1.Node = graph1.newNode
+		node1.connectTo(node2)
+		node3.connectTo(node1)
+
+		// Highly illegal. Police, open up wee, woo, wee, woo
+		val graph2: Graph = new Graph
+		val node21: graph2.Node = graph2.newNode
+		val node22: graph2.Node = graph2.newNode
+		node21.connectTo(node22)
+		val graph3: Graph = new Graph
+		val node31: graph3.Node = graph3.newNode
+		node31.connectTo(node21) // breaking the law, again... // Only works using #
+
+		// Adding # between the inner and outer class makes the inner class be able to 
+		// be used in different instances. See example up above.
+		
+		println("===================== ABSTRACT TYPE MEMBERS =====================")
+
+		trait Buffer {
+			type T
+			val element: T
+		}
+
+		abstract class SeqBuffer extends Buffer {
+			type U
+			type T <: Seq[U]
+			def length = element.length
+		}
+
+		// Notice use of U to bound T to be subtype of Sequence of Us
+		// Traits or classes with abstract type members can be used with anonymous classes
+
+		abstract class IntSeqBuffer extends SeqBuffer {
+			type U = Int
+		}
+
+		def newIntSeqBuf(elem1: Int, elem2: Int): IntSeqBuffer = 
+			new IntSeqBuffer {
+				type T = List[U]
+				val element = List(elem1, elem2)
+			}
+		val buf = newIntSeqBuf(7, 8)
+		println("length = " + buf.length)
+		println("content = " + buf.element)
+
+		// new IntSeqBuffer {} is the annonymous class lol
+
+		// Only using type parameters
+		abstract class Buffer2[+T] {
+			val element: T
+		}
+		abstract class SeqBuffer2[U, +T <: Seq[U]] extends Buffer2[T] {
+			def length = element.length
+		}
+
+		def newIntSeqBuf2(e1: Int, e2: Int): SeqBuffer2[Int, Seq[Int]] = 
+			new SeqBuffer2[Int, List[Int]] {
+				val element = List(e1, e2)
+			}
+
+		val buf2 = newIntSeqBuf2(7, 8)
+		println("length = " + buf2.length)
+		println("content = " + buf2.element)
+
+		println("===================== COMPOUND TYPES =====================")
+
+		trait Cloneable extends java.lang.Cloneable {
+			override def clone(): Cloneable = {
+				super.clone().asInstanceOf[Cloneable]
+			}
+		}
+		trait Resetable {
+			def reset: Unit
+		}
+
+		// notice 'with' in type of obj
+		def cloneAndReset(obj: Cloneable with Resetable): Cloneable = {
+			val cloned = obj.clone()
+			obj.reset
+			cloned
+		}
+
+		println("===================== SELF-TYPE =====================")
+
+		trait User {
+			def username: String
+		}
+
+		trait Tweeter {
+			this: User => // reassign this
+			def tweet(tweetText: String) = println(s"$username: $tweetText")
+		}
+
+		class VerifiedTweeter(val username_ : String) extends Tweeter with User {
+			def username = s"real $username_"
+		}
+
+		val realBeyonce = new VerifiedTweeter("Beyonce")
+		realBeyonce.tweet("Just spilled my glass of lemonade")
+
+		// note how username is not extended into Tweeter, just it is in scope
+
+		println("===================== IMPLICIT-PARAMETERS =====================")
+		
+		abstract class Monoid[A] {
+			def add(x: A, y: A): A
+			def unit: A
+		}
+
+		object ImplicitTest {
+			implicit val stringMonoid: Monoid[String] = new Monoid[String] {
+				def add(x: String, y: String): String = x concat y
+				def unit: String = ""
+			}
+
+			implicit val intMonoid: Monoid[Int] = new Monoid[Int] {
+				def add(x: Int, y: Int): Int = x + y
+				def unit: Int = 0
+			}
+
+			def sum[A](xs: List[A])(implicit m: Monoid[A]): A =
+				if (xs.isEmpty) m.unit
+				else m.add(xs.head, sum(xs.tail))
+
+			def testImplicit(): Unit = {
+ 
+				implicit val stringMonoid: Monoid[String] = new Monoid[String] {
+					def add(x: String, y: String): String = y concat x
+					def unit: String = " - oh noes - "
+	 			}
+				println(sum(List(1, 2, 3)))
+				println(sum(List("uno", "dos", "tres")))
+			}
+		}
+
+		val imp = ImplicitTest
+		imp.testImplicit
+
+		println("===================== IMPLICIT CONVERSIONS =====================")
+
+		//import scala.language.implicitConversions
+
+		implicit def list2ordered[A](x: List[A])(implicit elem2ordered: A => Ordered[A]): Ordered[List[A]] = 
+			new Ordered[List[A]] {
+				def compare(that: List[A]): Int = x.size - that.size
+			}
+
+		println(List(1, 2, 3) <= List(4, 5))
+
+		// Int conversion implicit conversion in scala.Predef library
+		import scala.language.implicitConversions
+
+		implicit def int2Integer(x: Int) = 
+			java.lang.Integer.valueOf(x)
+
+		println("===================== POLYMORPHIC METHODS =====================")
+
+		def listOfDuplicates[A](x: A, length: Int): List[A] = {
+			if (length < 1)
+				Nil
+			else
+				x :: listOfDuplicates(x, length - 1)
+		}
+		
+		println(listOfDuplicates[Int](3, 4))
+		println(listOfDuplicates("La", 8))
+
+		println("===================== TYPE INFERENCE =====================")
+
+		// Omitting the type
+		val businessName = "Montreauz Jazz Cafe"		
+
+		def squareOf(x: Int) = x * x
+
+		def fac(n: Int): Int = if (n == 0) 1 else n * fac(n - 1)
+
+		println(fac(8))
+
+		// Polymorphic methods and generic classes can have types infered
+		case class MyPair[A, B](x: A, y: B)
+		val p = MyPair(1, "scala")
+
+		def id[T](x: T) = x
+		val q = id(1)
+
+		// Parameters
+		println(Seq(1, 3, 4).map(x => x * 2))
+
+		// when not to rely on type inference
+
+		var obj = null
+		// obj = new AnyRef <-- cannot 
+
+		println("===================== OPERATORS =====================")
+		// In scala operators are methods
+		println(10.+(1)) // + is equivalent to .+() method
+		println(10 + 1)
+
+		// HOW TO DEFINE OPERATORS
+		case class Vec(x: Double, y: Double) {
+			def +(that: Vec) = Vec(this.x + that.x, this.y + that.y)
+		}
+
+		val vector1 = Vec(1.0, 1.0)
+		val vector2 = Vec(2.0, 2.0)
+
+		val vector3 = vector1 + vector2
+		println(vector3)
+
+		// more complex expressions
+		case class MyBool(x: Boolean) {
+			def and(that: MyBool): MyBool = if (x) that else this
+			def or(that: MyBool): MyBool = if (x) this else that
+			def negate: MyBool = MyBool(!x)
+		}
+
+		// notice use of and and or as infix
+		def not(x: MyBool) = x.negate
+		def xor(x: MyBool, y: MyBool) = (x or y) and not(x and y)
+
+		println("===================== BY-NAME PARAMETERS =====================")
+		def calculate(input: => Int) = input * 37 // notice => to indicate by-name parameter
+
+		def whileLoop(condition: => Boolean)(body: => Unit): Unit =
+			if (condition) {
+				body
+				whileLoop(condition)(body)
+			}
+
+		var i = 32
+
+		whileLoop(i > 0) {
+			println(i)
+			i -= 1
+		}
 	}
 }
