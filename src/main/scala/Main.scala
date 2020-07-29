@@ -826,5 +826,37 @@ object ScalaTour {
 			println(i)
 			i -= 1
 		}
+
+		println("===================== ANNOTATIONS =========================")
+
+		object DeprecationDemo extends App {
+		  @deprecated("deprecation message", "release # which deprecates method")
+		  def hello = "hola"
+		  hello  
+		}
+
+		import scala.annotation.tailrec
+
+		def factorial(x: Int): Int = {
+
+			@tailrec
+			def factorialHelper(x: Int, accumulator: Int): Int = {
+				if (x == 1) accumulator else factorialHelper(x - 1, accumulator * x)
+			}
+			factorialHelper(x, 1)
+		}
+
+		// println(factorial(38))
+// 
+		// def factorialWrong(x: Int): Int = {
+			// @tailrec
+			// def factorialHelperWrong(x: Int): Int = {
+				// if (x == 1) 1 else x*factorialHelperWrong(x - 1)
+			// }
+			// factorialHelperWrong(x)
+		// }
+// 
+		// println(factorialWrong(38))
+		// 
 	}
 }
